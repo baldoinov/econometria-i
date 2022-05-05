@@ -157,5 +157,7 @@ cython_debug/
 *.pdf
 anotacoes/
 slides/
+dados/SINASC_2010_2020/
+dados/inep/
 .RData
 .Rhistory
