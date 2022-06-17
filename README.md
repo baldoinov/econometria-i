@@ -6,7 +6,7 @@ Esse repositório contém os materiais do curso de Econometria I ministrado no 1
 
 1. [Anotações de aulas práticas](monitorias.ipynb)
 2. [Exercício Empírico I](ex_empirico_01.ipynb)
-3. Exercício Empírico II
+3. [Exercício Empírico II](ex_empirico_02.ipynb)
 4. Exercício Empírico III
 5. Trabalho Final
 
@@ -16,4 +16,4 @@ Esse repositório contém os materiais do curso de Econometria I ministrado no 1
 
 ***
 
-Em caso de dúvidas ou quaisquer outras questões, você pode me mandar um [e-mail](mailto:vdbaldoino@gmail.com?subject=GitHub%20-%20Econo%20Brasileira) ou me mandar uma mensagem pelo [LinkedIn](https://www.linkedin.com/in/vitorbaldoino/).
+Em caso de dúvidas ou quaisquer outras questões, você pode me mandar um [e-mail](mailto:vdbaldoino@gmail.com?subject=GitHub%20-%20Econometria) ou me mandar uma mensagem pelo [LinkedIn](https://www.linkedin.com/in/vitorbaldoino/).
