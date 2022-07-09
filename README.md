@@ -7,7 +7,7 @@ Esse repositório contém os materiais do curso de Econometria I ministrado no 1
 1. [Anotações de aulas práticas](monitorias.ipynb)
 2. [Exercício Empírico I](ex_empirico_01.ipynb)
 3. [Exercício Empírico II](ex_empirico_02.ipynb)
-4. Exercício Empírico III
+4. [Exercício Empírico III](ex_empirico_03.ipynb)
 5. Trabalho Final
 
 *** 

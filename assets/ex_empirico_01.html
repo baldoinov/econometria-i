@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1,user-scalable=no">
+<meta name="description" content="Exercício Empírico I - microjam page">
+<meta name="author" content="Vitor Baldoino - 11766857">
+<meta name="date" content="Sat Jan 01 2022 00:00:00 GMT-0300 (Horário Padrão de Brasília)">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js/styles/vs.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markdown-it-texmath/css/texmath.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/goessner/mdmath/themes/publication/style.css">
+
+<title>Exercício Empírico I</title>
+</head>
+<body id="top">
+<header>
+<h1>Exercício Empírico I</h1>
+<h3>Econometria I - EAE0324</h3>
+<h4>Vitor Baldoino - 11766857</h4>
+
+<h5>Maio 2022</h5>
+
+</header>
+<main>
+
+<hr dir="auto">
+<h2 dir="auto" id="descri%C3%A7%C3%A3o-dos-dados">Descrição dos Dados</h2>
+<p dir="auto">Os dados para este exercício são uma <em>cross-section</em> de alunos do curso de Economia da Universidade de São Paulo. Na nossa base de dados, nós temos acesso as seguintes variáveis:</p>
+<div  dir="auto" ></div>
+<center>
+<pre dir="auto"><code> #   Column            Non-Null Count  Dtype  
+---  ------            --------------  -----  
+ 0   genero            45 non-null     object 
+ 1   idade             45 non-null     int64  
+ 2   nota1             45 non-null     float64
+ 3   nota2             45 non-null     float64
+ 4   fuvest            44 non-null     float64
+ 5   gosta_curso       45 non-null     object 
+ 6   frequencia        45 non-null     object 
+ 7   gosta_estudo      45 non-null     object 
+ 8   ensino_medio      45 non-null     object 
+ 9   trabalho          45 non-null     object 
+ 10  nasceu_sp         45 non-null     object 
+ 11  pretende_estudar  45 non-null     object 
+</code></pre>
+<div  dir="auto" ></div>
+</center>
+<p dir="auto">Como indicado na tabela acima, nós possuímos uma observação faltante na variável que apresenta a nota da Fuvest. Essa ausência será tratada posteriormente no código que gera os modelos de regressão. Adicionalmente, como não iremos usar variáveis categóricas neste primeiro momento, eu optei por manter na base apenas as variáveis relevantes para o exercício.</p>
+<div  dir="auto" ></div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre dir="auto"><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<div  dir="auto" ></div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>genero</th>
+      <th>idade</th>
+      <th>nota1</th>
+      <th>nota2</th>
+      <th>fuvest</th>
+      <th>gosta_curso</th>
+      <th>frequencia</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>M</td>
+      <td>23</td>
+      <td>8.5</td>
+      <td>8.5</td>
+      <td>67.0</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>M</td>
+      <td>21</td>
+      <td>10.0</td>
+      <td>10.0</td>
+      <td>71.0</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>F</td>
+      <td>21</td>
+      <td>8.6</td>
+      <td>8.3</td>
+      <td>66.0</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>M</td>
+      <td>23</td>
+      <td>9.0</td>
+      <td>6.8</td>
+      <td>62.0</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>M</td>
+      <td>22</td>
+      <td>9.5</td>
+      <td>8.6</td>
+      <td>68.0</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p dir="auto">Abaixo, temos uma breve descrição das variáveis contínuas presentes na base. Como é possível ver, a nota em MAE0229 dos alunos é bem distribuída, assemelhando-se a uma normal. Entretanto, a variável de idade possui uma assimetria à direita, algo esperado dado as características dos indivíduos da amostra (estudantes universitários). E as notas de MAE0219 e as notas da Fuvest possuem uma assimetria à esquerda.</p>
+<p dir="auto"><img src="ex_empirico_01_files/ex_empirico_01_9_0.png" alt="png" class="loading" id="image-hash-1172905940" data-src="ex_empirico_01_files/ex_empirico_01_9_0.png"></p>
+<hr dir="auto">
+<h2 dir="auto" id="modelos-de-regress%C3%A3o">Modelos de Regressão</h2>
+<p dir="auto">Antes de passar para a estimação dos modelos, é necessário retirar o efeito das diferentes escalas de medidas dos dados. Isto é, como as notas das matérias da Universidade de São Paulo são medidas numa escala de 0 a 10 e a prova da Fuvest é medida em uma escala de 0 a 90, precisamos normalizar (trazer para um intervalo entre 0 e 1) os valores dessas variáveis. Terminado o procedimento descrito, a nova base de dados ficará assim:</p>
+<div  dir="auto" ></div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre dir="auto"><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<div  dir="auto" ></div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>genero</th>
+      <th>idade</th>
+      <th>nota1</th>
+      <th>nota2</th>
+      <th>fuvest</th>
+      <th>gosta_curso</th>
+      <th>frequencia</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>M</td>
+      <td>23</td>
+      <td>0.625</td>
+      <td>0.625</td>
+      <td>0.68750</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>M</td>
+      <td>21</td>
+      <td>1.000</td>
+      <td>1.000</td>
+      <td>0.81250</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>F</td>
+      <td>21</td>
+      <td>0.650</td>
+      <td>0.575</td>
+      <td>0.65625</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>M</td>
+      <td>23</td>
+      <td>0.750</td>
+      <td>0.200</td>
+      <td>0.53125</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>M</td>
+      <td>22</td>
+      <td>0.875</td>
+      <td>0.650</td>
+      <td>0.71875</td>
+      <td>S</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p dir="auto">Posto isso, podemos estimar o modelo:</p>
+<section><eqn><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>n</mi><mi>M</mi><mi>A</mi><mi>E</mi><mn>0229</mn><mo>=</mo><mover accent="true"><msub><mi>β</mi><mn>0</mn></msub><mo>^</mo></mover><mo>+</mo><mover accent="true"><msub><mi>β</mi><mn>1</mn></msub><mo>^</mo></mover><mi>n</mi><mi>M</mi><mi>A</mi><mi>E</mi><mn>0219</mn><mo>+</mo><msub><mover accent="true"><mi>u</mi><mo>^</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">nMAE0229 = \hat{\beta_0} + \hat{\beta_1}nMAE0219 + \hat{u}_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">0229</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.1523199999999998em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9578799999999998em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.26344em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.1523199999999998em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9578799999999998em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.26344em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">0219</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.69444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">u</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.22222em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></eqn></section></math>
+<p dir="auto">Onde <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mi>M</mi><mi>A</mi><mi>E</mi><mn>0229</mn></mrow><annotation encoding="application/x-tex">nMAE0229</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">0229</span></span></span></span></eq> é a nota dos alunos em Introdução à Probabilidade e Estatística I e <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mi>M</mi><mi>A</mi><mi>E</mi><mn>0229</mn></mrow><annotation encoding="application/x-tex">nMAE0229</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">0229</span></span></span></span></eq> é a nota dos alunos em Introdução à Probabilidade e Estatística II.</p>
+<div  dir="auto" ></div>
+<center>
+<pre dir="auto"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  nota2   R-squared:                       0.198
+Model:                            OLS   Adj. R-squared:                  0.179
+Method:                 Least Squares   F-statistic:                     10.62
+Date:                Mon, 23 May 2022   Prob (F-statistic):            0.00219
+Time:                        22:50:40   Log-Likelihood:                 15.114
+No. Observations:                  45   AIC:                            -26.23
+Df Residuals:                      43   BIC:                            -22.61
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          0.1507      0.113      1.339      0.188      -0.076       0.378
+nota1          0.4599      0.141      3.259      0.002       0.175       0.745
+==============================================================================
+</code></pre>
+<div  dir="auto" ></div>
+</center>
+<div  dir="auto" ></div>
+<center>
+<p dir="auto"><img src="ex_empirico_01_files/ex_empirico_01_14_0.png" alt="png" class="loading" id="image-hash--1514701760" data-src="ex_empirico_01_files/ex_empirico_01_14_0.png"></p>
+<div  dir="auto" ></div>
+</center>
+<p dir="auto">Os resultados da regressão acima dizem que um ponto a mais na nota de Introdução à Probabilidade e Estatística I (MAE0219), está associado a um aumento de <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.4599</mn></mrow><annotation encoding="application/x-tex">0.4599</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0.4599</span></span></span></span></eq> décimos na nota de Introdução à Probabilidade e Estatística II (MAE0229). Esse resultado faz algum sentido lógico, pois é esperado que alunos com mais base se saiam melhores nas matérias que presumem conhecimento prévio.</p>
+<p dir="auto">Entretanto, é necessário notar que o <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">R^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></eq> da regressão é de <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.1981</mn></mrow><annotation encoding="application/x-tex">0.1981</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0.1981</span></span></span></span></eq>, o que significa que o modelo especificado explica apenas 19% da varição da nota em MAE0229. De fato, houve a omissão de variáveis que podem impactar significativamente o grau de ajuste do modelo, tais como a idade dos alunos e o seu nível de preparação ao sair do ensino médio - medido pela nota da Fuvest.</p>
+<p dir="auto">Para corrigir o erro de omissão de variável do modelo anterior, estimaremos um novo modelo, dado por:</p>
+<section><eqn><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>n</mi><mi>M</mi><mi>A</mi><mi>E</mi><mn>0229</mn><mo>=</mo><mover accent="true"><msub><mi>β</mi><mn>0</mn></msub><mo>^</mo></mover><mo>+</mo><mover accent="true"><msub><mi>β</mi><mn>1</mn></msub><mo>^</mo></mover><mi>n</mi><mi>M</mi><mi>A</mi><mi>E</mi><mn>0219</mn><mo>+</mo><mover accent="true"><msub><mi>β</mi><mn>2</mn></msub><mo>^</mo></mover><mi>n</mi><mi>F</mi><mi>U</mi><mi>V</mi><mi>E</mi><mi>S</mi><mi>T</mi><mo>+</mo><msub><mover accent="true"><mi>u</mi><mo>^</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">nMAE0229 = \hat{\beta_0} + \hat{\beta_1}nMAE0219 + \hat{\beta_2}nFUVEST + \hat{u}_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">0229</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.1523199999999998em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9578799999999998em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.26344em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.1523199999999998em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9578799999999998em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.26344em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">0219</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.1523199999999998em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9578799999999998em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.05278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span style="top:-3.26344em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mord mathnormal" style="margin-right:0.10903em;">U</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mord mathnormal" style="margin-right:0.13889em;">EST</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.69444em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">u</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.22222em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></eqn></section></math>
+<p dir="auto">Onde as varáveis anteriores mantém seu significado e <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mi>F</mi><mi>U</mi><mi>V</mi><mi>E</mi><mi>S</mi><mi>T</mi></mrow><annotation encoding="application/x-tex">nFUVEST</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="mord mathnormal" style="margin-right:0.10903em;">U</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mord mathnormal" style="margin-right:0.13889em;">EST</span></span></span></span></eq> é a nota dos alunos na última prova da FUVEST que prestaram.</p>
+<div  dir="auto" ></div>
+<center>
+<pre dir="auto"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  nota2   R-squared:                       0.224
+Model:                            OLS   Adj. R-squared:                  0.186
+Method:                 Least Squares   F-statistic:                     5.912
+Date:                Mon, 23 May 2022   Prob (F-statistic):            0.00555
+Time:                        22:50:40   Log-Likelihood:                 15.094
+No. Observations:                  44   AIC:                            -24.19
+Df Residuals:                      41   BIC:                            -18.83
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          0.0846      0.139      0.611      0.545      -0.195       0.364
+nota1          0.4714      0.147      3.213      0.003       0.175       0.768
+fuvest         0.0879      0.141      0.622      0.538      -0.198       0.373
+==============================================================================
+</code></pre>
+<div  dir="auto" ></div>
+</center>
+<p dir="auto">Os resultados da regressão acima indicam que, mantendo a nota em MAE0219 constante, um ponto a mais na prova da Fuvest está associado a um aumento de 8,79% na média de MAE0229. Em outras palavras, dados dois estudantes com a mesma nota em MAE0219, a previsão é que o estudante que tiver obtido a maior nota na Fuvest terá uma nota 8,79% maior em MAE0229.</p>
+<p dir="auto">Analogamente, mantendo a nota da Fuvest constante, um aumento na nota de MAE0219 está associado a um aumento de 47% da média de MAE0229.</p>
+<p dir="auto">Entretanto, vale notar que o <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">R^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></eq> da regressão ainda é baixo - somente 22% da variação da nota em MAE0229 é explicada pelas variáveis da regressão. Isto é um indicativo de que temos outras variáveis no termo de erro <eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">u_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.58056em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></eq> que ajudam a explicar melhor a variação da nota de Introdução à Probabilidade e Estatística II. Em última instância, a omissão dessas variáveis (por exemplo, as variáveis categóricas que possuímos nas bases) podem causar um problema de viés dos estimadores da nossa regressão.</p>
+
+</main>
+</body>
+</html>
