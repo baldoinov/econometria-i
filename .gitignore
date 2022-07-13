@@ -159,6 +159,7 @@ cython_debug/
 anotacoes/
 slides/
 dados/trab_final/
+dados/ryan/
 municipio.csv
 microdados_mortalidade_1996_2020.csv
 estabelecimentos_saude_2005_2021.csv
