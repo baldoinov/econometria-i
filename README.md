@@ -2,7 +2,7 @@
 
 This repository contains the materials for the Econometrics I course taught in the 1st semester of 2022 at FEA-USP. Whenever possible, I will upload here the notes taken during practical classes, the practical exercises developed throughout the course, and the final project in the form of `notebooks`.
 
-## Conteúdos
+## Contents
 
 1. [Practical Class Notes](monitorias.ipynb)
 2. [Empirical Exercise I](ex_empirico_01.ipynb)
