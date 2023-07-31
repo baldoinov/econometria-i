@@ -1,20 +1,20 @@
-# Econometria I - EAE0324 - FEAUSP 2022.01
+# Econometrics I - EAE0324 - FEAUSP 2022.01
 
-Esse repositório contém os materiais do curso de Econometria I ministrado no 1º semestre de 2022 na FEA-USP. Quando possível, vou colocar aqui as anotações feitas em aulas práticas, os exercícios práticos desenvolvidos ao longo do curso e o trabalho final na forma de `notebooks`.
+This repository contains the materials for the Econometrics I course taught in the 1st semester of 2022 at FEA-USP. Whenever possible, I will upload here the notes taken during practical classes, the practical exercises developed throughout the course, and the final project in the form of `notebooks`.
 
 ## Conteúdos
 
-1. [Anotações de aulas práticas](monitorias.ipynb)
-2. [Exercício Empírico I](ex_empirico_01.ipynb)
-3. [Exercício Empírico II](ex_empirico_02.ipynb)
-4. [Exercício Empírico III](ex_empirico_03.ipynb)
-5. [*Trabalho Final - Qual o impacto do gasto público no nº de mortes dos municípios brasileiros.*](trab_final.ipynb)
-   1. [Notebook de aquisição/tratamento dos dados.](trab_final_dados.ipynb)
+1. [Practical Class Notes](monitorias.ipynb)
+2. [Empirical Exercise I](ex_empirico_01.ipynb)
+3. [Empirical Exercise II](ex_empirico_02.ipynb)
+4. [Empirical Exercise III](ex_empirico_03.ipynb)
+5. [*Final Project - What is the impact of public spending on the number of deaths in Brazilian municipalities?*](trab_final.ipynb)
+   1. [Data acquisition/treatment notebook.](trab_final_dados.ipynb)
 
 *** 
 
-- Bônus: [Modelo de Análise de Regressão](template_analise_regressao.ipynb)
+- Bonus: [Regression Analysis Template](template_analise_regressao.ipynb)
 
 ***
 
-Em caso de dúvidas ou quaisquer outras questões, você pode me mandar um [e-mail](mailto:vdbaldoino@gmail.com?subject=GitHub%20-%20Econometria) ou me mandar uma mensagem pelo [LinkedIn](https://www.linkedin.com/in/vitorbaldoino/).
+If you have any questions or any other issues, please email me at [vdbaldoino@gmail.com](mailto:vdbaldoino@gmail.com?subject=Hi!%20I%20saw%20your%20GitHub!) or send me a message on [LinkedIn](https://www.linkedin.com/in/vitorbaldoino/).
